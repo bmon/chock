@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	api "github.com/bmon/chock/api"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -21,9 +22,6 @@ func main() {
 		FullTimestamp: false,
 	})
 
-	r := mux.NewRouter()
-	r.Handle("/", http.FileServer(http.Dir("./static")))
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -32,7 +30,7 @@ func main() {
 	addr := ":" + port
 
 	srv := &http.Server{
-		Handler: handlers.LoggingHandler(os.Stdout, r),
+		Handler: handlers.LoggingHandler(os.Stdout, createRouter()),
 		Addr:    addr,
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
@@ -41,4 +39,13 @@ func main() {
 
 	log.Info("Staring server on", addr)
 	log.Fatal(srv.ListenAndServe())
+}
+
+func createRouter() *mux.Router {
+	r := mux.NewRouter()
+	r.Handle("/", http.FileServer(http.Dir("./static")))
+
+	api.InstallRoutes(r)
+
+	return r
 }
