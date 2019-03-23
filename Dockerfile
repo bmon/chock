@@ -6,7 +6,7 @@ ARG GO_VERSION=1.11
 FROM golang:${GO_VERSION}-alpine AS builder
 
 # Git is required for fetching the dependencies.
-# RUN apk add --no-cache ca-certificates git
+RUN apk add --no-cache ca-certificates git
 
 # Set the working directory outside $GOPATH to enable the support for modules.
 WORKDIR /src
@@ -29,6 +29,8 @@ FROM scratch AS final
 
 # Import the compiled executable from the first stage.
 COPY --from=builder /app /app
+# Copy static files to the final image
+COPY ./static /static
 # Import the root ca-certificates (required for Let's Encrypt)
 # COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
