@@ -43,9 +43,8 @@ func main() {
 
 func createRouter() *mux.Router {
 	r := mux.NewRouter()
-	r.Handle("/", http.FileServer(http.Dir("./static")))
-
 	api.InstallRoutes(r)
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./js/dist/")))
 
 	return r
 }
